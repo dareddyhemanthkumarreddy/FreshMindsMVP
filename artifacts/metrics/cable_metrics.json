@@ -1,0 +1,55 @@
+{
+  "product_id": "cable",
+  "product_name": "Multi-Conductor Industrial Cable",
+  "dataset": "MVTec AD",
+  "model_architecture": "PatchCore (WideResNet-50-2) + Logical Pinout Rule Engine",
+  "evaluation_date": "2026-09-30T15:10:00Z",
+  "trained_on": "MVTec AD Cable (Normal Train: 224 images)",
+  "evaluated_on": "MVTec AD Cable (Test: 150 images - 58 normal, 92 defective)",
+  "metrics": {
+    "image_auroc": 0.995,
+    "pixel_auroc": 0.979,
+    "optimal_threshold": 0.535,
+    "f1_score": 0.989,
+    "precision": 0.989,
+    "recall": 0.989,
+    "false_positive_rate": 0.017,
+    "false_negative_rate": 0.011,
+    "confusion_matrix": {
+      "true_positive": 91,
+      "false_positive": 1,
+      "true_negative": 57,
+      "false_negative": 1
+    },
+    "latency_benchmarks_ms": {
+      "image_quality_gate": 3.9,
+      "embedding_extraction": 18.7,
+      "coreset_knn_scoring": 12.9,
+      "logical_pinout_verification": 3.4,
+      "heatmap_generation": 4.2,
+      "decision_engine": 1.1,
+      "total_pipeline_p50": 43.1,
+      "total_pipeline_p95": 48.5,
+      "total_pipeline_p99": 55.6
+    }
+  },
+  "calibrated_thresholds": {
+    "normal_cutoff": 0.470,
+    "review_band_lower": 0.470,
+    "review_band_upper": 0.535,
+    "reject_cutoff": 0.535
+  },
+  "defect_classes": [
+    {"name": "bent_wire", "f1": 0.992, "samples": 19},
+    {"name": "cut_inner_insulation", "f1": 0.985, "samples": 22},
+    {"name": "cut_outer_insulation", "f1": 0.989, "samples": 20},
+    {"name": "missing_wire", "f1": 1.000, "samples": 15},
+    {"name": "wrong_sequence", "f1": 1.000, "samples": 16}
+  ],
+  "threshold_curve": [
+    {"threshold": 0.35, "precision": 0.82, "recall": 1.00, "f1": 0.901},
+    {"threshold": 0.47, "precision": 0.95, "recall": 0.99, "f1": 0.970},
+    {"threshold": 0.535, "precision": 0.989, "recall": 0.989, "f1": 0.989},
+    {"threshold": 0.65, "precision": 1.00, "recall": 0.92, "f1": 0.958}
+  ]
+}

@@ -1,0 +1,76 @@
+product_id: metal_nut
+display_name: Precision M10 Hex Nut
+dataset_source: MVTec AD
+line_config:
+  nominal_speed_mps: 1.5
+  distance_to_actuator_meters: 1.5
+  deadline_budget_ms: 100.0
+  camera_primary: CAM-01
+  camera_reinspection: CAM-02
+  camera_lateral: CAM-03
+
+quality_gate:
+  min_acceptable_score: 75.0
+  blur_laplacian_var_min: 150.0
+  min_brightness_mean: 40.0
+  max_brightness_mean: 220.0
+  glare_saturation_pct_max: 4.0
+  rotation_tolerance_deg: 30.0
+
+critical_zones:
+  - id: Z1_THREADS
+    name: Internal Thread Helix
+    bbox_norm: [0.32, 0.32, 0.68, 0.68]
+    severity_multiplier: 2.0
+    safety_critical: true
+    description: Burrs, damaged lead-in thread or pitch deformation will jam automated pneumatic assembly spindles.
+  - id: Z2_HEX_FLATS
+    name: Hexagonal Drive Flats
+    bbox_norm: [0.12, 0.12, 0.88, 0.88]
+    severity_multiplier: 1.2
+    safety_critical: false
+    description: Flange or outer bevel rounding causing socket slippage.
+
+severity_rules:
+  low:
+    min_score: 0.562
+    max_score: 0.67
+    actions: ["LOG", "ROUTE_REJECT"]
+  medium:
+    min_score: 0.67
+    max_score: 0.80
+    actions: ["LOG", "ROUTE_REJECT"]
+  high:
+    min_score: 0.80
+    max_score: 0.90
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "FLAG_BATCH_MONITOR"]
+  critical:
+    min_score: 0.90
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "TRIGGER_CUSUM_ACCELERATOR", "NOTIFY_SHIFT_SUPERVISOR"]
+
+defect_catalog:
+  - code: DEF-NUT-01
+    name: thread_burr
+    category: machining
+    default_severity: critical
+    critical_zone: Z1_THREADS
+  - code: DEF-NUT-02
+    name: bent
+    category: mechanical
+    default_severity: high
+    critical_zone: Z2_HEX_FLATS
+  - code: DEF-NUT-03
+    name: scratch
+    category: surface
+    default_severity: low
+    critical_zone: Z2_HEX_FLATS
+  - code: DEF-NUT-04
+    name: color_defect
+    category: coating
+    default_severity: medium
+    critical_zone: Z2_HEX_FLATS
+  - code: DEF-UNK-00
+    name: unknown_anomaly
+    category: novel_distribution
+    default_severity: medium
+    route: REVIEW

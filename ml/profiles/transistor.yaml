@@ -1,0 +1,82 @@
+product_id: transistor
+display_name: TO-220 Power Transistor
+dataset_source: MVTec AD
+line_config:
+  nominal_speed_mps: 1.2
+  distance_to_actuator_meters: 1.8
+  deadline_budget_ms: 120.0
+  camera_primary: CAM-01
+  camera_reinspection: CAM-02
+  camera_lateral: CAM-03
+
+quality_gate:
+  min_acceptable_score: 72.0
+  blur_laplacian_var_min: 140.0
+  min_brightness_mean: 45.0
+  max_brightness_mean: 215.0
+  glare_saturation_pct_max: 3.5
+  rotation_tolerance_deg: 12.0
+
+critical_zones:
+  - id: Z1_LEADS
+    name: Terminal Leads (Drain/Source/Gate)
+    bbox_norm: [0.55, 0.20, 0.95, 0.80]
+    severity_multiplier: 1.8
+    safety_critical: true
+    description: Bent or bridged leads will cause short circuits upon PCB through-hole wave soldering.
+  - id: Z2_TAB
+    name: Mounting Heat Sink Tab
+    bbox_norm: [0.05, 0.25, 0.40, 0.75]
+    severity_multiplier: 1.3
+    safety_critical: false
+    description: Flatness and hole clearance required for heatsink thermal dissipation.
+  - id: Z3_BODY
+    name: Epoxy Molded Case
+    bbox_norm: [0.38, 0.22, 0.60, 0.78]
+    severity_multiplier: 1.5
+    safety_critical: true
+    description: Mold voids or cracks permit moisture ingress leading to semiconductor junction breakdown.
+
+severity_rules:
+  low:
+    min_score: 0.548
+    max_score: 0.65
+    actions: ["LOG", "ROUTE_REJECT"]
+  medium:
+    min_score: 0.65
+    max_score: 0.78
+    actions: ["LOG", "ROUTE_REJECT"]
+  high:
+    min_score: 0.78
+    max_score: 0.88
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "FLAG_BATCH_MONITOR"]
+  critical:
+    min_score: 0.88
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "TRIGGER_CUSUM_ACCELERATOR", "NOTIFY_SHIFT_SUPERVISOR"]
+
+defect_catalog:
+  - code: DEF-TR-01
+    name: bent_lead
+    category: geometrical
+    default_severity: critical
+    critical_zone: Z1_LEADS
+  - code: DEF-TR-02
+    name: damaged_case
+    category: structural
+    default_severity: high
+    critical_zone: Z3_BODY
+  - code: DEF-TR-03
+    name: cut_lead
+    category: geometrical
+    default_severity: critical
+    critical_zone: Z1_LEADS
+  - code: DEF-TR-04
+    name: misplaced_heat_sink
+    category: assembly
+    default_severity: medium
+    critical_zone: Z2_TAB
+  - code: DEF-UNK-00
+    name: unknown_anomaly
+    category: novel_distribution
+    default_severity: medium
+    route: REVIEW

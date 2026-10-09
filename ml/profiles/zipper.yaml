@@ -1,0 +1,76 @@
+product_id: zipper
+display_name: Precision Metal Zipper
+dataset_source: MVTec AD
+line_config:
+  nominal_speed_mps: 2.0
+  distance_to_actuator_meters: 1.8
+  deadline_budget_ms: 80.0
+  camera_primary: CAM-01
+  camera_reinspection: CAM-02
+  camera_lateral: CAM-03
+
+quality_gate:
+  min_acceptable_score: 74.0
+  blur_laplacian_var_min: 160.0
+  min_brightness_mean: 45.0
+  max_brightness_mean: 210.0
+  glare_saturation_pct_max: 3.8
+  rotation_tolerance_deg: 8.0
+
+critical_zones:
+  - id: Z1_TEETH_MESH
+    name: Interlocking Element Mesh
+    bbox_norm: [0.30, 0.05, 0.70, 0.95]
+    severity_multiplier: 1.9
+    safety_critical: true
+    description: Deformed, chipped or missing zipper teeth will jam the slider block or burst open under crosswise tension.
+  - id: Z2_TAPE_BORDER
+    name: Woven Textile Tape Flange
+    bbox_norm: [0.05, 0.05, 0.95, 0.95]
+    severity_multiplier: 1.3
+    safety_critical: false
+    description: Tape frays, needle puncture tearing, or uneven selvage cord.
+
+severity_rules:
+  low:
+    min_score: 0.551
+    max_score: 0.66
+    actions: ["LOG", "ROUTE_REJECT"]
+  medium:
+    min_score: 0.66
+    max_score: 0.78
+    actions: ["LOG", "ROUTE_REJECT"]
+  high:
+    min_score: 0.78
+    max_score: 0.89
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "FLAG_BATCH_MONITOR"]
+  critical:
+    min_score: 0.89
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "TRIGGER_CUSUM_ACCELERATOR", "NOTIFY_SHIFT_SUPERVISOR"]
+
+defect_catalog:
+  - code: DEF-ZIP-01
+    name: broken_teeth
+    category: teeth_geometry
+    default_severity: critical
+    critical_zone: Z1_TEETH_MESH
+  - code: DEF-ZIP-02
+    name: missing_teeth
+    category: tooth_count
+    default_severity: critical
+    critical_zone: Z1_TEETH_MESH
+  - code: DEF-ZIP-03
+    name: fabric_interior_tear
+    category: textile
+    default_severity: high
+    critical_zone: Z2_TAPE_BORDER
+  - code: DEF-ZIP-04
+    name: rough_teeth_burr
+    category: surface
+    default_severity: medium
+    critical_zone: Z1_TEETH_MESH
+  - code: DEF-UNK-00
+    name: unknown_anomaly
+    category: novel_distribution
+    default_severity: medium
+    route: REVIEW

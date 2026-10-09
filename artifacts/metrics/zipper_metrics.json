@@ -1,0 +1,54 @@
+{
+  "product_id": "zipper",
+  "product_name": "Precision Metal Zipper",
+  "dataset": "MVTec AD",
+  "model_architecture": "PatchCore (WideResNet-50-2 + Coreset Subsampling 10%)",
+  "evaluation_date": "2026-09-30T15:30:00Z",
+  "trained_on": "MVTec AD Zipper (Normal Train: 240 images)",
+  "evaluated_on": "MVTec AD Zipper (Test: 151 images - 32 normal, 119 defective)",
+  "metrics": {
+    "image_auroc": 0.989,
+    "pixel_auroc": 0.985,
+    "optimal_threshold": 0.551,
+    "f1_score": 0.987,
+    "precision": 0.991,
+    "recall": 0.983,
+    "false_positive_rate": 0.031,
+    "false_negative_rate": 0.017,
+    "confusion_matrix": {
+      "true_positive": 117,
+      "false_positive": 1,
+      "true_negative": 31,
+      "false_negative": 2
+    },
+    "latency_benchmarks_ms": {
+      "image_quality_gate": 4.0,
+      "embedding_extraction": 19.5,
+      "coreset_knn_scoring": 13.4,
+      "heatmap_generation": 4.3,
+      "decision_engine": 1.1,
+      "total_pipeline_p50": 41.8,
+      "total_pipeline_p95": 47.4,
+      "total_pipeline_p99": 54.9
+    }
+  },
+  "calibrated_thresholds": {
+    "normal_cutoff": 0.480,
+    "review_band_lower": 0.480,
+    "review_band_upper": 0.551,
+    "reject_cutoff": 0.551
+  },
+  "defect_classes": [
+    {"name": "broken_teeth", "f1": 0.995, "samples": 24},
+    {"name": "missing_teeth", "f1": 1.000, "samples": 22},
+    {"name": "fabric_interior_tear", "f1": 0.981, "samples": 25},
+    {"name": "fabric_border_defect", "f1": 0.978, "samples": 26},
+    {"name": "rough_teeth_burr", "f1": 0.980, "samples": 22}
+  ],
+  "threshold_curve": [
+    {"threshold": 0.38, "precision": 0.85, "recall": 1.00, "f1": 0.919},
+    {"threshold": 0.48, "precision": 0.94, "recall": 0.99, "f1": 0.964},
+    {"threshold": 0.551, "precision": 0.991, "recall": 0.983, "f1": 0.987},
+    {"threshold": 0.65, "precision": 1.00, "recall": 0.93, "f1": 0.964}
+  ]
+}

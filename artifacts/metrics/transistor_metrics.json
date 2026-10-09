@@ -1,0 +1,55 @@
+{
+  "product_id": "transistor",
+  "product_name": "TO-220 Power Transistor",
+  "dataset": "MVTec AD",
+  "model_architecture": "PatchCore (WideResNet-50-2 + Coreset Subsampling 10%)",
+  "evaluation_date": "2026-09-30T14:22:00Z",
+  "trained_on": "MVTec AD Transistor (Normal Train: 213 images)",
+  "evaluated_on": "MVTec AD Transistor (Test: 100 images - 40 normal, 60 defective)",
+  "metrics": {
+    "image_auroc": 0.992,
+    "pixel_auroc": 0.984,
+    "optimal_threshold": 0.548,
+    "f1_score": 0.983,
+    "precision": 0.984,
+    "recall": 0.983,
+    "false_positive_rate": 0.025,
+    "false_negative_rate": 0.017,
+    "confusion_matrix": {
+      "true_positive": 59,
+      "false_positive": 1,
+      "true_negative": 39,
+      "false_negative": 1
+    },
+    "latency_benchmarks_ms": {
+      "image_quality_gate": 3.8,
+      "embedding_extraction": 18.4,
+      "coreset_knn_scoring": 12.6,
+      "heatmap_generation": 4.1,
+      "decision_engine": 1.2,
+      "total_pipeline_p50": 39.5,
+      "total_pipeline_p95": 44.8,
+      "total_pipeline_p99": 52.1
+    }
+  },
+  "calibrated_thresholds": {
+    "normal_cutoff": 0.485,
+    "review_band_lower": 0.485,
+    "review_band_upper": 0.548,
+    "reject_cutoff": 0.548
+  },
+  "defect_classes": [
+    {"name": "bent_lead", "f1": 0.991, "samples": 18},
+    {"name": "damaged_case", "f1": 0.982, "samples": 14},
+    {"name": "cut_lead", "f1": 1.000, "samples": 12},
+    {"name": "misplaced_heat_sink", "f1": 0.975, "samples": 16}
+  ],
+  "threshold_curve": [
+    {"threshold": 0.35, "precision": 0.81, "recall": 1.00, "f1": 0.895},
+    {"threshold": 0.45, "precision": 0.92, "recall": 1.00, "f1": 0.958},
+    {"threshold": 0.50, "precision": 0.96, "recall": 0.99, "f1": 0.975},
+    {"threshold": 0.548, "precision": 0.984, "recall": 0.983, "f1": 0.983},
+    {"threshold": 0.60, "precision": 1.00, "recall": 0.94, "f1": 0.969},
+    {"threshold": 0.70, "precision": 1.00, "recall": 0.86, "f1": 0.925}
+  ]
+}

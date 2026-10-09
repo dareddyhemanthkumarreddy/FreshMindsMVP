@@ -1,0 +1,92 @@
+product_id: cable
+display_name: Multi-Conductor Industrial Cable
+dataset_source: MVTec AD
+line_config:
+  nominal_speed_mps: 0.8
+  distance_to_actuator_meters: 1.6
+  deadline_budget_ms: 150.0
+  camera_primary: CAM-01
+  camera_reinspection: CAM-02
+  camera_lateral: CAM-03
+
+quality_gate:
+  min_acceptable_score: 70.0
+  blur_laplacian_var_min: 130.0
+  min_brightness_mean: 42.0
+  max_brightness_mean: 218.0
+  glare_saturation_pct_max: 3.0
+  rotation_tolerance_deg: 15.0
+
+logical_rules:
+  required_wire_count: 8
+  pinout_color_sequence: ["L1_BLACK", "L2_RED", "GND_GREEN", "GND_YELLOW", "SIG1_ORANGE", "SIG2_BLUE", "COM_WHITE", "COM_BROWN"]
+  crimp_terminal_retention_check: true
+
+critical_zones:
+  - id: Z1_CRIMP_PINS
+    name: Ring Terminal Crimps
+    bbox_norm: [0.70, 0.15, 0.95, 0.85]
+    severity_multiplier: 1.9
+    safety_critical: true
+    description: Loose, cracked or missing crimps induce high-resistance fire hazards or field disconnects.
+  - id: Z2_INSULATION
+    name: Stripped Insulation Interface
+    bbox_norm: [0.35, 0.20, 0.70, 0.80]
+    severity_multiplier: 1.6
+    safety_critical: true
+    description: Exposed bare conductor strands cause inter-phase flashover shorts.
+  - id: Z3_JACKET
+    name: Outer Protective Sheath
+    bbox_norm: [0.05, 0.30, 0.35, 0.70]
+    severity_multiplier: 1.2
+    safety_critical: false
+    description: Strain relief collar integrity and water ingress protection.
+
+severity_rules:
+  low:
+    min_score: 0.535
+    max_score: 0.65
+    actions: ["LOG", "ROUTE_REJECT"]
+  medium:
+    min_score: 0.65
+    max_score: 0.77
+    actions: ["LOG", "ROUTE_REJECT"]
+  high:
+    min_score: 0.77
+    max_score: 0.88
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "FLAG_BATCH_MONITOR"]
+  critical:
+    min_score: 0.88
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "TRIGGER_CUSUM_ACCELERATOR", "NOTIFY_SHIFT_SUPERVISOR"]
+
+defect_catalog:
+  - code: DEF-CAB-01
+    name: bent_wire
+    category: assembly
+    default_severity: high
+    critical_zone: Z1_CRIMP_PINS
+  - code: DEF-CAB-02
+    name: cut_inner_insulation
+    category: insulation
+    default_severity: critical
+    critical_zone: Z2_INSULATION
+  - code: DEF-CAB-03
+    name: cut_outer_insulation
+    category: jacket
+    default_severity: medium
+    critical_zone: Z3_JACKET
+  - code: DEF-CAB-04
+    name: missing_wire
+    category: logical_wiring
+    default_severity: critical
+    critical_zone: Z1_CRIMP_PINS
+  - code: DEF-CAB-05
+    name: wrong_sequence
+    category: logical_pinout
+    default_severity: critical
+    critical_zone: Z1_CRIMP_PINS
+  - code: DEF-UNK-00
+    name: unknown_anomaly
+    category: novel_distribution
+    default_severity: medium
+    route: REVIEW

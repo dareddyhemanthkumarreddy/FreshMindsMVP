@@ -1,0 +1,104 @@
+product_id: breakfast_box
+display_name: Compartmentalized Breakfast Box Tray
+dataset_source: MVTec LOCO AD (Logical & Structural Defects)
+line_config:
+  nominal_speed_mps: 0.6
+  distance_to_actuator_meters: 1.5
+  deadline_budget_ms: 200.0
+  camera_primary: CAM-01
+  camera_reinspection: CAM-02
+  camera_lateral: CAM-03
+
+quality_gate:
+  min_acceptable_score: 70.0
+  blur_laplacian_var_min: 120.0
+  min_brightness_mean: 40.0
+  max_brightness_mean: 225.0
+  glare_saturation_pct_max: 4.5
+  rotation_tolerance_deg: 20.0
+
+logical_rules:
+  required_components:
+    - id: granola_section
+      expected_zone: [0.25, 0.25, 0.50, 0.50]
+      allow_missing: false
+    - id: greek_yogurt_cup
+      expected_zone: [0.50, 0.25, 0.75, 0.50]
+      allow_missing: false
+      sealed_lid_required: true
+    - id: mixed_fruit_section
+      expected_zone: [0.25, 0.50, 0.50, 0.75]
+      allow_missing: false
+    - id: bakery_pastry
+      expected_zone: [0.50, 0.50, 0.75, 0.75]
+      allow_missing: false
+  foreign_contamination_allowed: false
+
+critical_zones:
+  - id: Z1_YOGURT_LID
+    name: Yogurt Foil Lid Seal
+    bbox_norm: [0.50, 0.25, 0.75, 0.50]
+    severity_multiplier: 2.0
+    safety_critical: true
+    description: Punctured or unsealed dairy product violates FDA / EFSA microbial shelf-life standards.
+  - id: Z2_FRUIT_TRAY
+    name: Fresh Berry Compartment
+    bbox_norm: [0.25, 0.50, 0.50, 0.75]
+    severity_multiplier: 1.5
+    safety_critical: true
+    description: Spoilage, foreign debris or mold ingress risk.
+  - id: Z3_BAKERY
+    name: Pastry Pocket
+    bbox_norm: [0.50, 0.50, 0.75, 0.75]
+    severity_multiplier: 1.2
+    safety_critical: false
+    description: Sizing, bake uniformity and displacement check.
+
+severity_rules:
+  low:
+    min_score: 0.528
+    max_score: 0.64
+    actions: ["LOG", "ROUTE_REJECT"]
+  medium:
+    min_score: 0.64
+    max_score: 0.76
+    actions: ["LOG", "ROUTE_REJECT"]
+  high:
+    min_score: 0.76
+    max_score: 0.88
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "FLAG_BATCH_MONITOR"]
+  critical:
+    min_score: 0.88
+    actions: ["LOG", "ACTUATE_PNEUMATIC_PUSHER", "TRIGGER_CUSUM_ACCELERATOR", "NOTIFY_SHIFT_SUPERVISOR"]
+
+defect_catalog:
+  - code: DEF-BOX-01
+    name: missing_yogurt
+    category: logical_missing
+    default_severity: critical
+    critical_zone: Z1_YOGURT_LID
+  - code: DEF-BOX-02
+    name: displaced_croissant
+    category: logical_displacement
+    default_severity: medium
+    critical_zone: Z3_BAKERY
+  - code: DEF-BOX-03
+    name: unsealed_fruit_compartment
+    category: packaging_seal
+    default_severity: critical
+    critical_zone: Z2_FRUIT_TRAY
+  - code: DEF-BOX-04
+    name: foreign_granola_contamination
+    category: foreign_matter
+    default_severity: critical
+    critical_zone: Z2_FRUIT_TRAY
+  - code: DEF-BOX-05
+    name: duplicate_spoon_anomaly
+    category: logical_excess
+    default_severity: low
+    critical_zone: Z3_BAKERY
+  - code: DEF-UNK-00
+    name: unknown_anomaly
+    category: novel_distribution
+    default_severity: medium
+    route: REVIEW

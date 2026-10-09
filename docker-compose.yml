@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: qualitylens-db
+    environment:
+      POSTGRES_DB: qualitylens
+      POSTGRES_USER: qualitylens_admin
+      POSTGRES_PASSWORD: factory_secure_password_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qualitylens_admin -d qualitylens"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: qualitylens-backend
+    environment:
+      DATABASE_URL: postgresql://qualitylens_admin:factory_secure_password_2026@db:5432/qualitylens
+      ENV: production
+      LINE_SPEED_MPS: "1.2"
+      ACTUATOR_DISTANCE_M: "1.8"
+      DEADLINE_BUDGET_MS: "120.0"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./artifacts:/app/artifacts:ro
+      - ./ml/profiles:/app/ml/profiles:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: qualitylens-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

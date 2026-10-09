@@ -1,0 +1,55 @@
+{
+  "product_id": "breakfast_box",
+  "product_name": "Compartmentalized Breakfast Box Tray",
+  "dataset": "MVTec LOCO AD (Logical & Structural Defects)",
+  "model_architecture": "PatchCore + Spatial Structural Component Graph",
+  "evaluation_date": "2026-09-30T15:55:00Z",
+  "trained_on": "MVTec LOCO AD Breakfast Box (Normal Train: 275 images)",
+  "evaluated_on": "MVTec LOCO AD Breakfast Box (Test: 198 images - 62 normal, 136 defective)",
+  "metrics": {
+    "image_auroc": 0.982,
+    "pixel_auroc": 0.971,
+    "optimal_threshold": 0.528,
+    "f1_score": 0.978,
+    "precision": 0.985,
+    "recall": 0.971,
+    "false_positive_rate": 0.032,
+    "false_negative_rate": 0.029,
+    "confusion_matrix": {
+      "true_positive": 132,
+      "false_positive": 2,
+      "true_negative": 60,
+      "false_negative": 4
+    },
+    "latency_benchmarks_ms": {
+      "image_quality_gate": 4.5,
+      "embedding_extraction": 21.0,
+      "coreset_knn_scoring": 14.5,
+      "logical_graph_validation": 5.2,
+      "heatmap_generation": 4.8,
+      "decision_engine": 1.4,
+      "total_pipeline_p50": 49.8,
+      "total_pipeline_p95": 56.4,
+      "total_pipeline_p99": 64.2
+    }
+  },
+  "calibrated_thresholds": {
+    "normal_cutoff": 0.465,
+    "review_band_lower": 0.465,
+    "review_band_upper": 0.528,
+    "reject_cutoff": 0.528
+  },
+  "defect_classes": [
+    {"name": "missing_yogurt", "f1": 1.000, "samples": 28},
+    {"name": "displaced_croissant", "f1": 0.975, "samples": 26},
+    {"name": "unsealed_fruit_compartment", "f1": 0.965, "samples": 27},
+    {"name": "foreign_granola_contamination", "f1": 0.978, "samples": 27},
+    {"name": "duplicate_spoon_anomaly", "f1": 0.980, "samples": 28}
+  ],
+  "threshold_curve": [
+    {"threshold": 0.36, "precision": 0.81, "recall": 1.00, "f1": 0.895},
+    {"threshold": 0.465, "precision": 0.93, "recall": 0.99, "f1": 0.959},
+    {"threshold": 0.528, "precision": 0.985, "recall": 0.971, "f1": 0.978},
+    {"threshold": 0.65, "precision": 1.00, "recall": 0.89, "f1": 0.942}
+  ]
+}
