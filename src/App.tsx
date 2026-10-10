@@ -101,27 +101,43 @@ export default function App() {
       .catch(console.error);
   };
 
-  // Interactive Inspect Handler
+  // Interactive Inspect Handler (Real-Time AI Vision)
   const handleInspectNew = (
     productId: string,
-    options: { simulateDefect?: boolean; simulateBlur?: boolean; simulateDark?: boolean }
-  ) => {
-    fetch('/api/inspect', {
+    options: {
+      simulateDefect?: boolean;
+      simulateBlur?: boolean;
+      simulateDark?: boolean;
+      imageData?: string;
+      imageName?: string;
+      opticalMetrics?: any;
+      sensitivityMode?: 'auto' | 'strict' | 'force_defect' | 'force_pass';
+    }
+  ): Promise<InspectionRecord> => {
+    return fetch('/api/inspect', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         product_id: productId,
         simulate_defect: options.simulateDefect,
         simulate_blur: options.simulateBlur,
-        simulate_dark: options.simulateDark
+        simulate_dark: options.simulateDark,
+        image_data: options.imageData,
+        image_name: options.imageName,
+        optical_metrics: options.opticalMetrics,
+        sensitivity_mode: options.sensitivityMode
       })
     })
       .then((r) => r.json())
       .then((res: InspectionRecord) => {
         setSelectedForInspection(res);
         setHistory((prev) => [res, ...prev]);
+        return res;
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error('Inspect API error', err);
+        throw err;
+      });
   };
 
   // Review Feedback Submit

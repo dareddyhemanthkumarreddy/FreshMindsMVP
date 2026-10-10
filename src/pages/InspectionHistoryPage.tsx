@@ -136,6 +136,7 @@ export const InspectionHistoryPage: React.FC<InspectionHistoryPageProps> = ({
         'Timestamp (ISO)',
         'Product ID',
         'Product Name',
+        'Identified Item',
         'Line',
         'Machine',
         'Batch Lot',
@@ -182,6 +183,7 @@ export const InspectionHistoryPage: React.FC<InspectionHistoryPageProps> = ({
           escapeCSV(item.timestamp),
           escapeCSV(item.product_id),
           escapeCSV(item.product_name),
+          escapeCSV(item.detected_item || item.product_name),
           escapeCSV(item.line),
           escapeCSV(item.machine),
           escapeCSV(item.batch),
@@ -514,7 +516,18 @@ export const InspectionHistoryPage: React.FC<InspectionHistoryPageProps> = ({
                         })}
                       </td>
                       <td className="py-2.5 px-3 font-sans text-neutral-800 font-medium">
-                        {item.product_name}
+                        <div className="flex items-center gap-2">
+                          {item.image_url && (
+                            <img
+                              src={item.image_url}
+                              alt=""
+                              className="w-6 h-6 rounded object-cover border border-neutral-200 shrink-0 bg-neutral-100"
+                            />
+                          )}
+                          <span className="truncate max-w-[150px]" title={item.detected_item || item.product_name}>
+                            {item.detected_item || item.product_name}
+                          </span>
+                        </div>
                       </td>
                       <td className="py-2.5 px-3 text-neutral-600">
                         Line {item.line} <span className="text-neutral-400">·</span> {item.machine}
@@ -611,6 +624,28 @@ export const InspectionHistoryPage: React.FC<InspectionHistoryPageProps> = ({
                 Severity: <SeverityBadge severity={selectedDrawerItem.severity} />
               </div>
             </div>
+
+            {/* Workpiece Image Inspection Snapshot */}
+            {selectedDrawerItem.image_url && (
+              <div className="border border-neutral-200 rounded-lg overflow-hidden bg-neutral-900 shadow-inner">
+                <div className="p-2 bg-neutral-800 text-[11px] font-mono text-neutral-300 flex items-center justify-between">
+                  <span>Workpiece Inspection Frame</span>
+                  <span className="text-neutral-400">{selectedDrawerItem.camera}</span>
+                </div>
+                <div className="relative aspect-video max-h-48 overflow-hidden flex items-center justify-center bg-black">
+                  <img
+                    src={selectedDrawerItem.image_url}
+                    alt={selectedDrawerItem.product_name}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                  {selectedDrawerItem.regions && selectedDrawerItem.regions.length > 0 && (
+                    <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-rose-600/90 text-white text-[10px] font-mono font-bold">
+                      {selectedDrawerItem.regions[0].defect_type} Flagged
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Plain-Language Explanation */}
             <div className="p-3.5 bg-blue-50/60 border border-blue-200/80 rounded-lg text-xs leading-relaxed text-blue-950 font-medium">

@@ -35,6 +35,8 @@ export interface InspectionRecord {
   timestamp: string;
   product_id: string;
   product_name: string;
+  detected_item?: string;
+  image_url?: string;
   line: string;
   machine: string;
   batch: string;
